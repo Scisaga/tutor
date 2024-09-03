@@ -1,0 +1,75 @@
+- **Algorithm**: 一组计算机遵循以解决问题的指令。
+- **Attention**: 神经网络中的一种机制，使其能够专注于输入序列的特定部分。
+- **Auto Encoder**: 一种可以学习重构其输入的神经网络。
+- **Back Propagation**: 用于训练神经网络的算法。
+- **Batch size**: 在训练过程中一次处理的示例数量。
+- **Bias**: AI 偏差是指 AI 算法在某些群体中产生系统性不同结果的倾向。
+- **Bleu score**: 测量两个文本序列相似度的指标。
+- **Boilerplate**: 在特定上下文中使用的一组常见短语或词语。
+- **Brute force**: 一种通过尽可能快地尝试所有可能解决方案来解决问题的方法。
+- **Character**: 单个字母、数字或符号。
+- **Chunk**: 一组由神经网络一起处理的标记。
+- **Codex**: 文本或文档的集合。
+- **Confusion matrix**: 一张显示模型正确分类示例频率的表格。
+- **Convolution**: 一种用于从图像中提取特征的数学运算。
+- **Cost function**: 衡量模型性能的指标。
+- **Cross-entropy**: 分类任务中使用的损失函数。
+- **Data augmentation**: 一种通过人工创建新示例来增加数据集大小的技术。
+- **Dataset**: 用于训练模型的数据集合。
+- **Decoder**: 一种神经网络，将标记序列作为输入并输出标记序列。
+- **Denoising autoencoder**: 在受损数据上训练的自编码器。
+- **Discriminator**: 一种用于区分真实数据和假数据的神经网络。
+- **Distributional semantics**: 基于词语在上下文中使用方式表示其含义的一种方法。
+- **Embedding**: 词语或短语的向量表示。
+- **Encoder**: 一种神经网络，将标记序列作为输入并输出输入的向量表示。
+- **Epoch**: 数据集在训练期间的一次完整遍历。
+- **Error**: 模型预测值与真实值之间的差异。
+- **Embedding layer**: 神经网络中的一个层，将词语或短语映射为向量。
+- **Feature**: 对象或事件的特征。
+- **Feature extraction**: 从数据中识别特征的过程。
+- **Feature vector**: 特征的向量表示。
+- **Generative AI**: 一种可以创建新内容（如文本、图像和音乐）的人工智能。它通过学习大量数据，然后使用这些数据生成与其所见数据相似的新示例。
+- **Gradient descent**: 用于找到函数最小值的算法。
+- **Gradient descent with momentum**: 一种梯度下降的变体，使用梯度的移动平均值来改善收敛性。
+- **Gradient tape**: 记录损失函数相对于模型参数梯度的机制。
+- **Hallucination**: 生成式 AI 输出的错误、不准确或误导性内容。当程序在包含错误或误导性信息的数据集上训练时，这种情况可能会发生。
+- **Hyperparameter**: 用于控制模型训练的参数。
+- **Image captioning**: 生成图像自然语言描述的任务。
+- **Imitation learning**: 一种通过观察人类或其他代理的行为学习的机器学习类型。
+- **Inference**: 使用模型对新数据进行预测的过程。
+- **Instance**: 数据集中单个示例。
+- **Loss function**: 衡量模型误差的函数。
+- **Machine learning**: 赋予计算机无需显式编程即可学习的能力的计算机科学领域。
+- **Manifold learning**: 一种将数据点映射到低维流形的降维方法。
+- **Maximum likelihood**: 一种估计模型参数的方法。
+- **Mean squared error (MSE)**: 衡量模型预测值与真实值之间平方差的损失函数。
+- **Mel-spectrogram**: 在语音识别中使用的音频信号表示。
+- **Model**: 系统的数学表示。
+- **Neural network**: 受人脑结构启发的一种机器学习模型。
+- **Normalization**: 将数据转换为均值为 0、标准差为 1 的过程。
+- **One-hot encoding**: 将分类数据表示为向量的一种方法。
+- **Optimizer**: 用于在训练期间更新模型参数的函数。
+- **Overfitting**: 模型过于学习训练数据而无法推广到新数据时出现的问题。
+- **Parameter**: 用于控制模型行为的值。
+- **Perplexity**: 衡量模型预测下一个词能力的指标。
+- **Phrase**: 一组用于形成有意义单位的词语。
+- **Prompt**: 用于从模型生成响应的一段文本。
+- **Recurrent neural network (RNN)**: 一种可以处理数据序列的神经网络。
+- **Regularization**: 防止过拟合的技术。
+- **Reinforcement learning**: 一种机器学习类型，其中代理通过在环境中采取行动以最大化奖励来学习。
+- **Representation**: 对数据进行编码以便模型使用的一种方式。
+- **Retrieval-based model**: 一种通过从数据集中检索相似文本来生成文本的生成模型。
+- **Sequence-to-sequence model**: 一种可以将数据序列从一种形式转换为另一种形式的神经网络。
+- **Skip-gram**: 一种基于文本语料库训练的词嵌入。
+- **Softmax**: 用于归一化概率集的函数。
+- **Speech recognition**: 将口语转换为文本的任务。
+- **Stochastic gradient descent**: 一种使用数据的随机子集更新模型参数的梯度下降变体。
+- **Supervised learning**: 一种机器学习类型，其中模型在有标签的数据上进行训练。
+- **Token**: 文本的单个单位，如单词、字符或标点符号。
+- **Training set**: 用于训练模型的数据集。
+- **Transfer learning**: 用于将知识从一个任务转移到另一个任务的技术。
+- **Unsupervised learning**: 一种模型在没有标签数据上进行训练的机器学习类型。
+- **Value function**: 表示在特定状态下采取特定行动预期奖励的函数。
+- **Word embedding**: 词语的向量表示。
+- **Word2vec**: 一种学习词嵌入的技术。
+- **Zero-shot learning**: 一种模型在没有目标类别示例的情况下进行训练的监督学习类型。
