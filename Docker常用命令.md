@@ -1,14 +1,14 @@
 ## 日志
 查看容器日志文件路径：
-```
+```sh
 docker inspect --format='{{.LogPath}}' ${container-name}
 ```
 清空容器日志：
-```
+```sh
 $ sudo sh -c 'echo "" > $(docker inspect --format="{{.LogPath}}" ${container-name})'
 ```
 检视容器日志：
-```shell
+```sh
 # 最新100条
 docker logs ${container-name} --tail 100
 # 最近1小时
