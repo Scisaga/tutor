@@ -28,6 +28,28 @@ Label Studio 是一个开源的数据标注工具，用于探索和标注多种�
    - Label Studio提供多样化的数据格式和标注选择。对于不同的数据格式，Label Studio支持图像、音频、文本、时间序列和多领域数据格式的数据标注。在图像标注方面，Label Studio支持目标检测、图像分类和语义分割。而文本标注提供文本分类、问答、情感分析和命名实体等功能。有关其他标注技术，请查看官方Label Studio网站。
 - 文档齐全
    - Label Studio拥有详细的官方网站和大量关于Label Studio使用的在线教程和视频，用户在遇到问题时可以随时找到在线帮助！
+- [Gitlab](https://github.com/HumanSignal/label-studio) | [Docker](https://hub.docker.com/r/heartexlabs/label-studio)
+   - https://labelstud.io/guide/install#Install-with-Docker
+ 
+教程
+- https://labelstud.io/playground/
+- https://labelstud.io/videos/
+
+模板
+- Tags
+   - https://labelstud.io/tags/
+- NLP
+   - https://labelstud.io/templates/named_entity
+   - https://labelstud.io/templates/relation_extraction
+
+API
+   - Annotations: https://labelstud.io/api#operation/api_annotations_read
+
+服务集成
+   - https://labelstud.io/integrations/
+
+Galileo 数据纠错
+   - https://labelstud.io/integrations/platform/galileo/
 
 ## Docker 部署脚本
 ```bash
