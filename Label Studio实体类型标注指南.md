@@ -109,7 +109,7 @@ docker-compose -f label-studio.yaml up -d
 
 点击右上角**Export data**按钮，可将标注数据导出为 JSON、JSON-MIN、CSV、TSV 和 CONLL2003 格式。此处不支持其他数据格式，因为它们与文本数据注释无关（它们用于图像和语音数据注释）。我们选择的数据格式是 JSON。
 
-![labelstudio](images/labelstudio-8.png)
+<img src="images/labelstudio-8.png" width="600px">
 
 JSON导出格式示例（可用后续训练使用）：
 ```json
