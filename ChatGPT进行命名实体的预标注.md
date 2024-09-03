@@ -100,3 +100,10 @@ def openai_chat_completion_response(final_prompt):
 # 参考
 - [Using ChatGPT to Pre-annotate Named Entities Recognition Labeling Tasks](https://kili-technology.com/data-labeling/machine-learning/using-chatgpt-to-pre-annotate-named-entities-recognition-labeling-tasks)
 - [Zero-Shot Named Entity Recognition using OpenAI ChatGPT API](https://sourajit16-02-93.medium.com/zero-shot-named-entity-recognition-using-openai-chatgpt-api-46738191f375)
+- [GPT-NER: Named Entity Recognition via Large Language Models](https://arxiv.org/pdf/2304.10428.pdf)
+- [【论文精读】GPT-NER: Named Entity Recognition via Large Language Models](https://blog.csdn.net/HERODING23/article/details/130476395)
+- https://github.com/ShuheWang1998/GPT-NER
+- [How far is Language Model from 100% Few-shot Named Entity Recognition in Medical Domain](https://arxiv.org/pdf/2307.00186.pdf) 微调后 f1 > 0.9 低资源解决方案
+- [PromptNER : Prompting For Named Entity Recognition](https://arxiv.org/pdf/2305.15444.pdf)
+- [Automated Concatenation of Embeddings for Structured Prediction](https://arxiv.org/pdf/2010.05006.pdf)
+- [微调BaiChuan13B来做命名实体识别](https://zhuanlan.zhihu.com/p/645339671) 带训练微调步骤 f1 = 0.87
