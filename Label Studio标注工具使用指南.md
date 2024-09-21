@@ -1,4 +1,4 @@
-# Label Studio 简介
+## Label Studio 简介
 
 ![labelstudio](images/labelstudio-1.png)
 
@@ -6,7 +6,7 @@ Label Studio 是一个开源的数据标注工具，用于探索和标注多种�
 
 在本文中，将使用 Label Studio 作为我们的主要数据标注工具。我们将介绍一些示例，展示如何使用不同的数据格式标注或标记不同的数据集。
 
-## 什么是数据标注
+### 什么是数据标注
 
 数据标注是为数据集中的每个点贴上标签的过程，以显示监督式机器学习模型需要预测的实际输出。它是一个对数据进行分类和贴标签的过程，这意味着用户将使用每个可用数据点并手动对其进行分类，以便机器学习模型使用。
 
@@ -14,14 +14,14 @@ Label Studio 是一个开源的数据标注工具，用于探索和标注多种�
 
 逐一标记数万个数据点是一件很繁琐的工作，因此数据标注工具的开发用以简化这项任务。
 
-## 什么是数据标注工具
+### 什么是数据标注工具
 
 数据标注工具（Data Annotation Tool）用于标注数据集（包含用于训练机器学习模型的数据集合）中的数据点，这可以帮助标记用于机器学习、深度学习、计算机视觉、自然语言处理等的数据集。
 
 可以使用不同的数据标注工具，具体取决于给定的任务。例如，根据数据类型（文本、图像、音频）将有助于决定使用哪种工具。有些公司甚至会创建自己的数据标注工具。
 
-# 安装 Label Studio
-## Label Studio 特点介绍
+## 安装 Label Studio
+### Label Studio 特点介绍
 - 安装和使用简便
    - Label Studio的实际安装和使用过程非常简便。它提供了一个小的学习曲线，重点关注初学者友好性，提供易于下载的简短命令和清晰易用的图形用户界面。
 - 支持各种数据类型的数据标注
@@ -31,27 +31,28 @@ Label Studio 是一个开源的数据标注工具，用于探索和标注多种�
 - [Gitlab](https://github.com/HumanSignal/label-studio) | [Docker](https://hub.docker.com/r/heartexlabs/label-studio)
    - https://labelstud.io/guide/install#Install-with-Docker
  
-教程
+#### 教程
 - https://labelstud.io/playground/
 - https://labelstud.io/videos/
 
-模板
+#### 模板
 - Tags
    - https://labelstud.io/tags/
 - NLP
    - https://labelstud.io/templates/named_entity
    - https://labelstud.io/templates/relation_extraction
+   - [Question Answering](https://labelstud.io/templates/question_answering) 阅读理解，在原文中标注问题的答案
 
-API
+#### API
    - Annotations: https://labelstud.io/api#operation/api_annotations_read
 
-服务集成
+#### 服务集成
    - https://labelstud.io/integrations/
 
-Galileo 数据纠错
+#### Galileo 数据纠错
    - https://labelstud.io/integrations/platform/galileo/
 
-## Docker 部署脚本
+### Docker 部署脚本
 ```bash
 #!/bin/bash
 mkdir -p ./label-studio/data && \
@@ -77,8 +78,8 @@ services:
 docker-compose -f label-studio.yaml up -d
 ```
 
-# 文本数据标注
-## 创建项目
+## 文本数据标注
+### 创建项目
 登录到您的Label Studio帐户后，首先创建一个新的数据标注项目。为您的项目选择一个名称，并简要描述您试图实现的目标。在这种情况下，我们将项目命名为 **NER-Test**，并说明主要目标是对文本中的实体打标签。
 
 ![labelstudio](images/labelstudio-2.png)
@@ -86,7 +87,7 @@ docker-compose -f label-studio.yaml up -d
 参考：
 1. [Project setup](https://docs.humansignal.com/guide/setup_project)
 
-## 导入数据集
+### 导入数据集
 在为项目命名并提供项目描述后，单击屏幕中央顶部的 **Data Import** 按钮。然后单击 **上传更多文件**，从您的本地设备导入所选的数据集。对于本示例中使用的数据，请确保以接受的格式上传数据文件。这里使用的格式是 .txt 扩展名，上传完文件后，请选择Treat CSV/TSV as List of tasks，会将数据文章中的每一行解析为一个标注任务。
 
 数据文件示例：
@@ -98,13 +99,13 @@ docker-compose -f label-studio.yaml up -d
 
 ![labelstudio](images/labelstudio-3.png)
 
-## 选择数据标注类型和标注模板
+### 选择数据标注类型和标注模板
 
 单击屏幕右上方的 **Labeling setup**。如前所述，我们希望对文本数据执行数据标注，因此单击 **Natural Language Processing**。自然语言处理是语言学、计算机科学和人工智能的一个分支领域，涉及计算机与人类语言之间的交互，以及如何编程计算机来处理和分析大量自然语言数据。接下来点击 **Named Entity Recognition**，这将允许我们将数据划分为多个我们选择的类别。命名实体识别是信息提取的一个子任务，它旨在定位和分类非结构化文本中提到的命名实体，并将其划分为预定义的类别，例如姓名、组织、地点、医疗代码、时间表达式、数量、货币价值、百分比等。
 
 ![labelstudio](images/labelstudio-4.png)
 
-## 配置命名实体识别标注参数
+### 配置命名实体识别标注参数
 在选择模板选项后（在本例中为命名实体识别），我们需要确定标签的数量。
 - 我们将删除所有现有标签并创建5个新标签：
    - ORG：组织/机构
@@ -119,12 +120,12 @@ docker-compose -f label-studio.yaml up -d
 
 ![labelstudio](images/labelstudio-5.png)
 
-## 进行命名实体标注
+### 进行命名实体标注
 选择一个数据样本，单击NER标签，在下方文本中选取对应的文字，就完成了一个实体标签的标注。重复该步骤，直到将数据样本中的所有实体标注完成，点击下方 **Submit/Update** 保存标注内容：
 
 ![labelstudio](images/labelstudio-6.png)
 
-## 导出标注数据
+### 导出标注数据
 点击页面上方面包屑导航中的项目名称（此处为NER-Test），回到项目页面，在该页面中可以对数据样本进行分类排序和检视，继续导入数据和导出标注好的数据。
 
 ![labelstudio](images/labelstudio-7.png)
@@ -203,7 +204,7 @@ JSON导出格式示例（可用后续训练使用）：
                   "type":"labels",
                   "origin":"manual"
                },
-               ...
+               <...
             ],
             "unique_id":"33bbe12a-f13d-4b2c-8fa9-8e406b1d86ec",
 			...
@@ -217,7 +218,7 @@ JSON导出格式示例（可用后续训练使用）：
 ]
 ```
 
-# 后记
+## 后记
 有效的数据标注AI模型训练至关重要。有效标注的数据越多，AI模型对更大数据集的泛化就越快越准确。留出一些已标记的测试数据集来测试AI模型的准确性也是模型持续迭代的必须步骤。
 
 TODO：
@@ -226,7 +227,7 @@ TODO：
 - [ ] 指代消解标注示例
 - [ ] 解决关系在配置界面无法显示的问题
 
-# 参考
+## 参考
 1. [Intro and Short Tutorial on Data Annotation with Label Studios](https://medium.com/@khang.pham.exxact/intro-and-short-tutorial-on-data-annotation-with-label-studios-63e6d537fffc)
 2. [Named Entity Recognition with Flair-based Embeddings](https://labelstud.io/integrations/machine-learning/flair/)
 3. https://labelstud.io/templates/named_entity.html
