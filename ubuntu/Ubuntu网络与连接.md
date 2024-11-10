@@ -32,11 +32,25 @@ Ubuntu <= 14
 nmcli dev list iface eth0 | grep IP4
 ```
 
+#### Win 11 PS
+```shell
+# 查看所有网络接口配置
+Get-NetIPConfiguration
+
+# 设置网络接口DNS服务
+Set-DnsClientServerAddress -InterfaceIndex <网络接口序号> -ServerAddresses <dns-server-addr1>,<dns-server-addr2>
+```
+
 ### 测试 DNS 解析
 ```shell
 nslookup [-option ...] domain-name [dns-server]
 nslookup isc.org 8.8.8.8
 ```
+
+#### `/etc/resolve.conf`覆盖问题
+1. 修改`/etc/systemd/resolved.conf`，增加DNS配置
+2. 重启域名解析服务`systemctl restart systemd-resolved`
+3. 创建软链接`ln -s /run/systemd/resolve/resolv.conf /etc/`，如果已存在先删除再创建
 
 ### 配置 MAC 地址
 列出本地网络所有设备的MAC地址
