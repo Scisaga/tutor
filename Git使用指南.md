@@ -57,7 +57,7 @@ git branch -d feeder
 参考：
 * [分支的新建与合并](https://git-scm.com/book/zh/v1/Git-%E5%88%86%E6%94%AF-%E5%88%86%E6%94%AF%E7%9A%84%E6%96%B0%E5%BB%BA%E4%B8%8E%E5%90%88%E5%B9%B6)
 
-### git 拉去代码
+### git 拉取代码
 ```shell
 git clone <远程仓库地址>
 
@@ -160,6 +160,13 @@ git commit -m "提交说明"
 git push origin master
 ```
 注： 修改本地`.gitignore`会更好
+
+## 设置代理
+修改`./.git/config`
+```shell
+[http "https://github.com"]
+    proxy = http://a.b.c.d:xxx
+```
 
 ## 外部资料
 * [Git 简单使用](https://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000)
