@@ -819,14 +819,571 @@ Keycloak的细粒度授权主要有三个必要步骤：
 1. Keycloak中，Resource定义了一组通用的信息：
    - Name：可读的、全局唯一的字符串
    - Type：唯一标识一组资源类型的字符串，用来对不同资源实例分组。因此可以使用一组通用的权限来保护它们
-   - URIs：代表着资源的地址，对于HTTP资源来说，URIS通常是资源的相对路径
-   - Scopes：资源关联的一个或多个作用域
+   - URIs：代表资源地址，对于HTTP资源来说，URIS通常是资源的相对路径
+   - Authorization Scopes：授权作用域，一个或多个
+      - **通常表示对指定资源可施加的动作**，如查看、编辑、删除等等。
+      - 资源的范围扩展了资源的访问界限。
+      - 在授权语义中，范围是可以应用在资源上的许多动词之一。
+      - 参考：[Scopes explained](https://www.keycloak.org/docs/latest/server_admin/#scopes-explained)
    - Resource attributes：资源可能具有与其关联的属性。 这些属性可用于提供有关资源的附加信息，并在评估与资源关联的权限时为策略提供附加信息。每个属性都是一个键值对，其中值可以是一组一个或多个字符串。 可以通过用逗号分隔每个值来为属性定义多个值。
 2. 可以从列表中选择资源点击Create Permission来为其创建权限
     - 创建权限前请确保已定义好需要关联的策略
 3. 资源管理API：[Managing resources](https://www.keycloak.org/docs/latest/authorization_services/index.html#_service_protection_resources_api)
 
 #### 创建资源
+主要需要考虑的是资源的粒度。Keycloak的Resource概念可以用来表示一组（一个或多个）资源，需要考虑如何进行资源的定义。
+1. 点击资源列表上方的`Create`按钮
+![](.Keycloak简明指南_images/client-resources-1.png)
+
+### 授权策略
+
+1. 策略定义了授予对象访问权时必须**满足的条件**。
+2. 与权限不同，策略不指定受保护的对象，而是指定访问对象（如资源、范围或两者）时必须满足的条件。
+3. 策略与用来保护资源的访问控制机制(ACMs)密切相关。使用策略可以实现基于属性的访问控制(ABAC)、基于角色的访问控制(RBAC)、基于上下文的访问控制以及其任何组合。Keycloak还提供了聚合策略，即“策略的策略”。
+4. 在构造复杂的访问控制条件时，Keycloak授权服务遵循了分而治之的原则。你可以创建独立的策略，并在不同的权限中使用它们，然后通过组合它们来构造更复杂的策略。
+5. 可以看成是访问某个对象需要满足的条件；它通过permission将这个条件和受保护对象结合起来
+
+Keycloak支持的授权策略类型
+![](.Keycloak简明指南_images/policy-1.png)
+
+资源服务器需要依据一些信息才能判断权限。对于REST的资源服务器这些信息通常来自于一个加密的token，如在每个访问请求中携带bearer token。对于依赖于session的Web应用来说，这些信息就来自于每个request对应的用户session。
+
+#### 基于用户的策略 User-based policy
+
+1. 基于用户的策略可以限制只有指定的用户能够访问被保护的资源。
+2. 配置信息：
+   - Name：名称是一个可读且唯一的字符串。建议取一些和业务相关的名字以易于识别。
+   - Description：策略的描述信息
+   - Users：指定此策略授予哪些用户访问权限。
+   - Logic：在评估其他条件后应用此策略的逻辑。POSITIVE（正向）/NEGATIVE（负向）
+      - 策略可以配置为正向或负向。简单地说，可以使用这个选项来定义策略结果是应该保持原样，还是被否定。
+      - 举例来说，假设创建了策略，其中只有没有授予特定角色的用户才被授权。此时可以使用该角色创建基于角色的策略，并将其逻辑字段设置为极负向（Negative）。
+
+![](.Keycloak简明指南_images/policy-user.png)
+
+#### 基于角色的策略 Role-based policy
+
+1. 此种策略允许只有指定的Role才能获取权限。
+2. 默认情况下，如果发起请求的用户已被授予此策略中任意一个角色就可以获得授权。但是，如果要强制执行特定角色，可以根据需要指定特定角色。您还可以组合必需和非必需角色，无论它们是realm role还是client role。
+3. 配置信息：
+   - Name
+   - Description
+   - Roles：可以选择Realm role和Client role
+   - Logic：正向或负向
+
+![](.Keycloak简明指南_images/policy-role.png)
+
+#### 基于组的策略 Group-based policy
+
+1. 此种策略允许只有你指定的组才能获取访问权限。
+2. 配置信息：
+   - Name
+   - Description
+   - Groups Claim：在包含组名和/或路径的令牌中指定声明（即令牌key/value中的key）。通常，授权请求是基于ID Token或Access Token处理的。该策略将根据Token的组声明来获取用户所属的组。如果没有定义，则从域配置中获取。
+   - Groups：允许您在评估权限时选择应由该策略强制执行的组。添加组后，可以通过标记复选框扩展至子级来扩展对组子级的访问。如果未标记，则访问限制仅适用于所选组。
+   - Logic：正向或负向
+
+![](.Keycloak简明指南_images/policy-group.png)
+
+#### 基于客户端的策略 Client-based policy
+1. 根据权限定义条件，允许一组一个或多个客户端访问某个对象。
+2. 配置信息：
+   - Name
+   - Description
+   - Clients：该策略关联的客户端
+   - Logic：正向或负向
+
+![](.Keycloak简明指南_images/policy-client.png)
+
+#### 基于客户端作用域的策略 Client-scope policy
+1. 基于特定客户端作用域的策略
+2. 配置信息：
+   - Name
+   - Description
+   - Client scopes：选择对应的客户端作用域
+   - Logic：正向或负向
+
+![](.Keycloak简明指南_images/policy-client-scope.png)
+
+#### 基于时间的策略 Time-based policy
+
+1. 此种策略允许你制定时间相关的权限条件。
+2. 配置信息：
+   - Name
+   - Description
+   - Repeat：非重复 / 重复
+      - Month
+      - Day
+      - Hour
+      - Minute
+   - Start time
+   - Expire time
+   - Logic：正向或负向
+
+![](.Keycloak简明指南_images/policy-time.png)
+
+#### 聚合策略 Aggregated policy
+1. Keycloak支持构建策略的策略，称之为聚合策略。你可以使用策略聚合，通过重用现有的策略来构建更复杂策略，使得权限与策略更解耦。
+2. 配置信息：
+   - Name
+   - Description
+   - Apply Policy：定义一组与聚合策略关联的一个或多个策略。这里可以选择已有的策略，也可以创建新策略。
+   - Decision Strategy：此权限的决策逻辑
+      - Unanimous：全体一致策略
+         - 所有相关策略必须同时评估为“允许”才能授予访问权限。
+         - 如果任何一个策略评估为“拒绝”，最终结果就是“拒绝”。
+         - 如果所有策略均未明确评估为“允许”，最终结果为“拒绝”。
+      - Affirmative：肯定优先策略
+         - 只要有一个策略评估为“允许”，就授予访问权限。
+         - 优先考虑“允许”，如果至少一个策略评估为“允许”，最终结果为“允许”。
+         - 只有在所有策略均评估为“拒绝”或未明确允许时，最终结果为“拒绝”。
+      - Consensus：共识策略
+         - 基于多数决，策略的“允许”票数多于“拒绝”票数时授予访问权限。
+         - 如果“允许”的策略多于“拒绝”的策略，则最终结果为“允许”。
+         - 如果“拒绝”的策略多于或等于“允许”的策略，则最终结果为“拒绝”。
+         - 未明确评估（如“不适用”）的策略不会影响最终结果。
+   - Logic：正向或负向
+
+![](.Keycloak简明指南_images/policy-aggregated.png)
+
+### 权限 Permission
+
+**Permissions权限将上文的策略和作用对象结合起来**
+
+1. 权限将被保护的对象与必须评估的策略关联起来，以确定是否允许访问。
+2. 例如 X 可以在资源 Z 上施加 Y；
+    1. 这里 X 指可以是用户、角色、用户组，或者其组合。在这里你可以使用声明和上下文。
+    2. Y 指代一个动作，如写、读等等。
+    3. Z 指代的源，如 "/accounts"
+3. Keycloak提供了丰富的平台用于构建从简单到复杂的权限策略，如基于规则的权限控制，使用Keycloak可以带来：
+    1. 减少代码重构和权限管理成本；
+    2. 支持灵活的安全模型，用以应对安全模型可能的变化
+    3. 支持运行时变化。应用系统只需要关心资源和范围，Keycloak隐藏了它们被保护的细节。
+4. 权限包含两种，分别是基于资源的权限和基于范围的权限。可在Authorization一栏的Permission出创建、管理权限。
+
+#### 基于资源的权限 Resource-based Permission
+
+1. 基于资源的权限定义了一组资源且使用一组策略来保护这些它们。
+2. 可以针对一组同类型的资源统一设定权限。在对有着相同访问限制的资源设置权限时非常有用。
+3. 比如说在一个金融类的应用，其中每个银行账户属于一个特定的用户。虽然是不同的银行账户，但是可以共享全局银行机构通用的安全性要求。你可以使用分类的资源权限来定义这些通用策略。
+   - 例如：仅有账户拥有者才能管理自己的账户仅能在账户拥有者的国家/地区进行访问执行特定的身份认证方法
+4. 配置信息：
+   - Name
+   - Description
+   - Apply To Resource Type：指定权限是否应用于具有给定类型的所有资源。 选择此字段时，系统会提示您输入要保护的资源类型。
+   - Resources/Resource Type：定义一组要保护的一个或多个资源/资源类型
+   - Policies：定义此权限关联的一组策略。这里可以选择已有的策略或者新建
+   - Decision Strategy：此权限的决策策略
+
+![](.Keycloak简明指南_images/permission-resource-based.png)
+
+#### 基于范围的权限 Scoped-based Permission
+
+1. 基于范围的权限定义一组范围，通过关联授权策略来保护这些范围。
+2. 与基于资源的权限不同，可以使用此权限类型为为资源关联的范围创建权限，从而提供更细的权限控制粒度。
+3. 要创建新的基于范围的权限，请在新建权限时选择Scoped-based。
+4. 配置信息：
+   - Name
+   - Description
+   - Apply To Resource Type：指定权限是否应用于具有给定类型的所有资源。 选择此字段时，系统会提示您输入要保护的资源类型。
+   - Resource/Resource Type：将范围限制为与所选资源关联的范围。 如果没有选择，则所有范围都可用。
+   - Authorization scopes：定义一组要保护的一个或多个scope
+   - Policies：定义此权限关联的一组策略。这里可以选择已有的策略或者新建
+   - Decision Strategy
+
+![](.Keycloak简明指南_images/permission-scope-based.png)
+
+### 决策策略 Decision Strategy
+
+#### 资源服务器 Resource Server 决策策略
+
+当外部请求（如用户）对某个资源进行访问时，Resource Server会根据决策策略评估此资源所有的Permission是否符合判定要求，以决定外部请示是否有权限访问此资源
+
+1. Affirmative：至少一个绑定该资源权限必须评估为一个积极的决定，以便授予对资源及其范围的访问权限。
+2. Unanimous：味着绑定此资源的所有权限必须评估为积极的决定，以便最终决定也是积极的。
+
+例如，如果同一资源或范围的两个权限发生冲突（其中一个是授予访问权限，另一个是拒绝访问），如果选择的策略是Affirmative，则将授予对该资源或范围的权限。 否则，任何权限的单个拒绝也将拒绝对资源或范围的访问。
+
+#### 权限 Permission 决策策略
+
+Permission将一个或多个Policy绑定至Resource，以确定Resource的访问规则
+
+1. Affirmative
+2. Unanimous
+3. Consensus：意味着积极决策的数量必须大于消极决策的数量。如果正面和负面的数量相同，则最终决定是否定的。
+
+#### 决策策略示例
+
+如果有多个权限匹配给定的资源/范围，最终是否授予对资源/范围的访问权限取决于以下：
+
+1. The Resource Server's decision strategy（Affirmative/Unanimous）
+2. 每个Permission's decision strategy（Affirmative/Unanimous/Consensus）
+3. 每个Policy's logic value（Positive/Negative）
+
+例如：  
+一个Resource设置了两个Permission（permission\_A，permission\_B），permission\_A引用了两个policy（policy\_A\_1，policy\_A\_2），permission\_B引用了两个Policy（policy\_B\_1，policy\_B\_2），policy的Logic的均设置为Positive
+
+1. permission\_A的决策策略设置为Affirmative，假设引用的Policy评估为：
+    1. policy\_A\_1：true
+    2. policy\_A\_2：false
+2. permission\_B的决策策略设置为Unanimous，假设引用的Policy评估为：
+    1. policy\_B\_1：true
+    2. policy\_B\_2：false
+
+对于permission\_A，由于其决策策略设置为Affirmative，所以只要其引用的Policy中有一个评估为true权限permission\_A被认定为true；对于permission\_B，由于其决策策略设置为Unanimous，只有当其引用的所有Policy均被评估为true，其才会被认定为true。  
+最终评估：
+
+1. 当资源服务器的决策策略设置为Affirmative，只要有一个Permission被认定为true，则说明对此Resource具有访问权限
+2. 当资源服务器的决策策略设置为Unanimous，只有当所有的Permission被认定为true，才能对此Resource具有访问权限
+
+## UMA资源管理
+
+### 名词解释
+
+1. 资源服务器 Resource Server / RS
+   - 存放资源并能够分发permission ticket
+   - Resource Server是**策略执行点（PEP）**，所以它知道访问API需要的Scope，且能够根据RPT的验证结果返回对应的资源。
+   - 判断访问是否含有token，没有Token则请求Permission Ticket，有Token则验证Token
+2. 授权服务器 Authorization Server / AS
+   - 发布token，验证policy，保护资源。这里指Keycloak
+   - 是策略决策点 Policy Decision Point
+3. 客户端 Client / C
+   - 试图访问受保护资源的应用
+   - Client不知道Scope，通过获得的Permission Ticket提供
+4. 资源所有者 Resource Owner / RO
+   - 拥有并决定是否接受访问资源的用户
+5. 请求第三方 Requesting Party / RP
+   - 请求访问资源的用户
+6. 权限凭据 Permission Ticket / PT
+   - 包含了资源信息和资源动作范围的凭据
+
+### UMA资源授权流程
+
+**资源注册**
+
+1. Resource Owner 向 RS 注册资源（例如文件、健康数据）。
+2. RS 将资源的元数据（资源标识符、类型、支持的操作等）发送到 AS。
+3. 授权策略配置：
+4. Resource Owner 在 AS 定义资源的访问策略（如谁可以访问、何时访问）。
+
+**客户端请求资源**
+
+1. Requester 通过 Client 向 RS 请求访问资源（如读取文件）。
+2. 如果 Client 没有有效的 RPT（Requesting Party Token） 或权限不足，RS 拒绝请求并返回一个 Permission Ticket。
+   - Permission Ticket是RS 生成的临时票据，标识请求的资源和操作，用于后续向 AS 请求授权。
+   - Permission Ticket 是匿名的，不包含请求者的身份信息。
+
+**权限请求阶段**
+
+1. Client 携带 Permission Ticket 和自身的认证凭据（如 Access Token）向 AS 请求权限。
+   - 请求中包括需要访问的资源标识符和操作权限（如 read、write）。
+2. AS 验证 Permission Ticket 和 Access Token 是否有效。
+   - 根据资源拥有者定义的访问策略（如基于角色、时间、地点等条件）评估请求。
+3. 如果权限请求通过，AS 生成并返回一个 RPT（Requesting Party Token） 给 Client。
+
+**资源访问阶段**
+
+1. Client 携带 RPT 再次向 RS 请求资源访问。
+2. RS 验证 RPT 的合法性（如签名、权限范围、有效期等）。
+   - 如果验证通过，RS 执行请求操作（如提供资源或完成写入操作）。
+   - 如果 RPT 不足以覆盖新的权限请求，RS 返回新的 Permission Ticket，流程重新回到权限请求阶段。
+
+### Keycloak资源授权流程实例
+
+**注意**：在进行Keycloak资源认证时要修改前端Client中Access Token的信息内容。在默认情况下Access Token中会包含Realm Role和Client Role信息，但在使用基于Role的授权策略时，Client Role内容会非常会非常多，导致前端Access Token不能存入Cookie。为解决此问题，需要通过修改Client Scope的内容来定义Access Token中包含的信息：
+
+1. 将Client Role信息从前端Client的Access Token中剔除，后端Token不变
+   - 点击Client scopes，点击roles，点击Mappers，从三个已有Mapper中删除client roles
+2. 点击Create client scope，设置Name为client_roles，点击Save
+   - 在新建的Scope中点击Add mapper → From predefined Mapper → 选择client roles
+3. 点击Clients → 选择前端Client → 点击Client中的Client scopes → Add client scope → 勾选client roles → 将client roles的Assign Type设置为Optional
+4. 点击Clients → 选择后端Client → 点击Client中的Client scopes → Add client scope → 勾选client roles → 将client roles的Assign Type设置为Default
+
+Keycloak资源验证流程如下:
+
+1. Keycloak中新建资源，Policy，Scope，并通过新建Permission进行绑定。
+2. 用户请求受保护资源，Resource Server会带着`Access Token`请求Keycloak，索要对应资源的`Permission Ticket`。
+3. Keycloak返回Permission Ticket给资源服务器，资源服务器在拿着Permission Ticket索要RPT token
+   - Keycloak如果正确返回RPT则去验证RPT，并验证RPT获取受保护资源信息，验证成功则允许访问JupyterLab页面
+   - 如果索要RPT失败则无法访问
+
+整体设想流程如下，与标准的UMA方式略有不同：
+
+#### 角色和访问流程
+
+1. Client：前端应用
+   - 访问资源URL，Cookie中带上`Access Token`
+2. 资源服务器 Resource Server
+   1. 判断Cookie中是否含有`Access Token`，没有则返回登录页面
+   2. 查询中台被访问资源的Resource ID和Scope
+   3. 请求`Permission Ticket`
+   4. 请求`RPT Token`
+   5. 请求验证`RPT Token`
+3. 授权服务器 Authorization Server：Keycloak
+   - 负责分发`Permission Ticket`和`RPT Token`，验证`RPT token`
+4. 中台
+   - 通过API在Keycloak中创建对应资源和Scope，记录返回的ID信息以供查询
+   - 通过API给资源创建绑定Policy，需要Resource Owner的`Access Token`
+
+![](.Keycloak简明指南_images/keycloak-authorization-workflow.svg)
+
+### API接口测试
+参考：
+- [Keycloak Managing permission requests](https://www.keycloak.org/docs/latest/authorization_services/index.html#_service_protection_permission_api_papi)
+
+#### Permission Ticket获取
+通过Permission Ticket的方式访问资源，在用户无权访问受保护资源时，可以发送一条请求给资源的Owner。
+```shell
+curl -X POST \
+http://${host}:${port}/realms/${realm}/authz/protection/permission \
+  -H 'Authorization: Bearer '${access_token} \
+  -H 'Content-Type: application/json' \
+  -d '[
+  {
+    "resource_id": "{resource_id}",
+    "resource_scopes": [
+      "view"
+    ],
+    "claims": {
+      "organization": ["acme"]
+    }
+  }
+]'
+```
+返回信息
+```json
+{
+    "ticket": "${permission_ticket}"
+}
+```
+
+#### 通过permission ticket获取RPT token
+submit_request代表是否发送资源请求
+```shell
+curl -X POST \ http://${host}:${port}/realms/${realm}/protocol/openid-connect/token \
+  -H "Authorization: Bearer ${access_token}" \ 
+  --data "grant_type=urn:ietf:params:oauth:grant-type:uma-ticket" \ 
+  --data "ticket=${permission_ticket}"
+  --data "submit_request=${submit_request}"
+```
+返回信息
+```shell
+{
+  "upgraded": false,
+  "access_token": "${rpt}",
+  "expires_in": 1800,
+  "refresh_expires_in": 1800,
+  "refresh_token": "",
+  "token_type": "Bearer",
+  "not-before-policy": 0
+}
+```
+
+#### 直接获取RPT token（不使用Permission Ticket）
+这里的Resource可以是Resource Id，也可以是Resource Name
+```shell
+curl -X POST \ http://${host}:${port}/realms/${realm}/protocol/openid-connect/token \ 
+  -H "Authorization: Bearer ${access_token}" \
+  --data "grant_type=urn:ietf:params:oauth:grant-type:uma-ticket" \ 
+  --data "audience=${resource_server_client_id}" \ 
+  --data "permission=Resource_A#Scope A" \ 
+  --data "permission=Resource_B#Scope B"
+```
+返回信息与使用Permission Ticket获取的access token相同。
+
+#### 验证RPT token
+- basic_secret是`client_id:client_secret`的base64编码
+- 结合直接获取RPT,可以用来获得Resource Name对应的Resource Id
+```shell
+curl -X POST  "http://${host}:${port}/realms/${realm}/protocol/openid-connect/token/introspect" \
+    -H "Authorization: Basic ${basic_secret}" \
+    -H "Content-Type: application/x-www-form-urlencoded" \
+    -d 'token_type_hint=requesting_party_token&token=${rpt}'
+```
+返回信息
+```shell
+{
+    "exp": 1616847431,
+    "nbf": 0,
+    "iat": 1616845631,
+    "jti": "84079d88-1f34-4a3e-944a-2f233ef1a889",
+    "aud": "dvclab",
+    "typ": "Bearer",
+    "acr": "1",
+    "permissions": [
+        {
+            "scopes": [
+                "view"
+            ],
+            "rsid": "${rsid}",
+            "rsname": "${rsname}",
+            "resource_scopes": [
+                "view"
+            ],
+            "resource_id": "${resource_id}"
+        }
+    ],
+    "active": true
+}
+```
+如果该用户无权访问资源则返回
+```shell
+{
+    "error": "access_denied",
+    "error_description": "request_submitted"
+}
+```
+且此处资源拥有者在资源管理界面会收到资源访问请求，资源拥有者可以决定是否给予此用户对应的Scope访问权限
+
+#### 创建资源
+- 这里的 `$pat` 是grant_type为client_credentials，通过client_id和client_secret获取的access_token
+- 如果要设置”_id”，必须设置成UUID的形式，8-4-4-4-12，否则无法通过 id 来访问该资源
+
+```shell
+curl -v -X POST \ 
+  http://${host}:${port}/realms/${realm}/authz/protection/resource_set \ 
+  -H 'Authorization: Bearer $pat \ 
+  -H 'Content-Type: application/json' \ 
+  -d '{
+    "name": "test_1",
+    "type": "test",
+    "owner": "admin",
+    "ownerManagedAccess": true,
+    "_id": "2898b46e-9a74-4cee-8f19-dccde51de020",
+    "resource_scopes":[
+      "visit",
+      "view"
+    ]
+  }'
+```
+返回信息
+```json
+{
+    "name": "test_1",
+    "type": "test",
+    "owner": {
+        "id": "e407b23f-f9f7-4028-8dcd-cb4f58b7f686",
+        "name": "admin"
+    },
+    "ownerManagedAccess": true,
+    "_id": "27fad3cf-3ea8-4f65-a43b-5d4323c5241a",
+    "resource_scopes": [
+        {
+            "id": "3f5a408c-17bb-47ae-a805-683b7c5ed28c",
+            "name": "view"
+        },
+        {
+            "id": "563ee5af-c6f0-4b1f-8814-6fdca0ec62b7",
+            "name": "visit"
+        }
+    ],
+    "scopes": [
+        {
+            "id": "3f5a408c-17bb-47ae-a805-683b7c5ed28c",
+            "name": "view"
+        },
+        {
+            "id": "563ee5af-c6f0-4b1f-8814-6fdca0ec62b7",
+            "name": "visit"
+        }
+    ]
+}
+```
+
+#### 更新资源信息
+资源的owner无法更新
+```shell
+curl -v -X PUT \
+  http://${host}:${port}/realms/${realm_name}/authz/protection/resource_set/{resource_id} \ 
+  -H 'Authorization: Bearer '$pat \
+  -H 'Content-Type: application/json' \ 
+  -d '{ "_id": "Alice Resource", "name":"Alice Resource", "resource_scopes": [ "read" ] }'
+```
+
+#### 给资源创建并绑定Policy
+access_token是资源拥有者的Access Token，例子：给资源绑定只有特定用户才能访问的策略：
+
+```shell
+curl -X POST \
+http://${host}:${port}/realms/${realm}/authz/protection/uma-policy/${resource_id} \
+  -H 'Authorization: Bearer '$access_token \
+  -H 'Cache-Control: no-cache' \
+  -H 'Content-Type: application/json' \
+  -d '{
+        "name": "only-one-access",
+        "description": "Allow access to one user",
+        "scopes": ["visit"],
+        "users": "test1"
+  }'
+```
+返回信息
+```json
+{
+    "exp": 1617004841,
+    "nbf": 0,
+    "iat": 1617003041,
+    "jti": "84f2c242-fbe5-485a-be0e-44bcce893946",
+    "aud": "dvclab",
+    "typ": "Bearer",
+    "acr": "1",
+    "permissions": [
+        {
+            "scopes": [
+                "visit"
+            ],
+            "rsid": "27fad3cf-3ea8-4f65-a43b-5d4323c5241a",
+            "rsname": "test_2",
+            "resource_scopes": [
+                "visit"
+            ],
+            "resource_id": "27fad3cf-3ea8-4f65-a43b-5d4323c5241a"
+        }
+    ],
+    "active": true
+}
+```
+
+#### 更新资源绑定策略
+access_token需要是资源owner的Access Token
+
+```shell
+curl -X PUT \
+  http://${host}:${port}/realms/${realm}/authz/protection/uma-policy/${permission_id} \
+  -H 'Authorization: Bearer '$access_token \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "id": "21eb3fed-02d7-4b5a-9102-29f3f09b6de2",
+    "name": "Any people manager",
+    "description": "Allow access to any people manager",
+    "type": "uma",
+    "scopes": [
+        "album:view"
+    ],
+    "logic": "POSITIVE",
+    "decisionStrategy": "UNANIMOUS",
+    "owner": "7e22131a-aa57-4f5f-b1db-6e82babcd322",
+    "roles": [
+        "user"
+    ]
+}'
+```
+
+#### 删除资源绑定策略
+```shell
+curl -X DELETE \ 
+  http://${host}:${port}/realms/${realm}/authz/protection/uma-policy/${permission_id} \
+  -H 'Authorization: Bearer '$access_token
+```
+
+### 中台鉴权时序图
+![](.Keycloak简明指南_images/authorization-sequence-diagram.svg)
+说明：以上为用户成功访问受保护资源的情况，实际操作中还存在访问无需用户Token的接口、用户Token无效、用户未被授权（获取不到Rpt Token）、用户访问无权限管理的接口等情况
+1. 无需用户Token：不进入Authenticator，直接进入请求方法对应的路由
+2. 需要用户Token：
+   - 用户Token无效：halt(401, “Token error”)
+   - 用户Token有效未被授权：由获取Rpt Token方法抛出异常，在before中处理，halt(403, “forbidden, access denied”)
+   - 用户访问无授权管理的接口：if逻辑判断resourceName为null或者scope为null时，用户Token验证通过后直接放行
+
 
 <style>
 body { counter-reset: h1counter h2counter h3counter h4counter h5counter h6counter; }
