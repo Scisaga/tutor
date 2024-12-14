@@ -34,8 +34,6 @@ PreDown = ip -4 rule del to 10.0.7.0/24 lookup 51820
 AllowedIPs = 0.0.0.0/0
 ```
 
-
-
 #### 自身流量转发问题
 若wg服务启动后，server自身流量无法转发到wg网络，需要进行如下问题排查：
 1. 通过查看wg客户端allowed-ips为0.0.0.0/0的ip rule，发现多了两条规则；ip rule管理路由策略，可以指导流量包找到对应的路由表，如下是 ip rule的显示结构

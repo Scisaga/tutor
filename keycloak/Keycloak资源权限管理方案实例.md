@@ -1,4 +1,5 @@
 # Keycloak资源权限管理方案实例
+scisaga@gmail.com
 
 ## 研究目标
 
