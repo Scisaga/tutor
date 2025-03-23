@@ -161,6 +161,23 @@ git push origin master
 ```
 注： 修改本地`.gitignore`会更好
 
+## Git LFS
+
+Git LFS为了解决大文件托管的效率问题，提供了五大特性：
+- 更大：支持GB级别的大文件版本控制。
+- 更小：让Git仓库空间占用减小。
+- 更快：仓库的克隆和拉取更快。
+- 透明：Git使用上对用户完全透明。
+- 兼容：权限控制上完全兼容。
+
+```shell
+# 让仓库支持Git LFS
+git lfs install
+```
+
+参考：
+1. [如何使用Git LFS?](https://help.aliyun.com/zh/yunxiao/user-guide/how-to-use-git-lfs)
+
 ## 设置代理
 修改`./.git/config`
 ```shell
