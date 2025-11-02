@@ -77,7 +77,9 @@ sudo nethogs
 参考：
 * [从零开始学习iftop流量监控（找出服务器耗费流量最多的ip和端口）](https://www.cnblogs.com/chenqionghe/p/10680075.html)
 
+
 ## 远端测试
+
 ### 测试远程端口是否开放
 ```shell
 nmap <IP> -p <PORT>
@@ -168,3 +170,18 @@ su - <user> -c "autossh -N -f -M 10984 -o \"PubkeyAuthentication=yes\" -o \"Pass
 * Autossh 用户手册：http://www.manpagez.com/man/1/autossh/
 * [autossh for Persistent Reverse ssh Tunnels](https://akntechblog.wordpress.com/2010/09/11/autossh-for-persistent-reverse-ssh-tunnels/)
 * https://github.com/jonhiggs/autossh
+
+## 设置全局代理
+
+修改 ~/.bashrc 或 ~/.zshrc，在末尾添加：
+```sh
+export https_proxy="http://127.0.0.1:7890"
+export http_proxy="http://127.0.0.1:7890"
+export all_proxy="socks5://127.0.0.1:7890"
+export no_proxy="localhost,127.0.0.1,::1,*.local,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12"
+```
+
+刷新环境：
+```sh
+source ~/.bashrc
+```
