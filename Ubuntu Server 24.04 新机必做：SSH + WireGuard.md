@@ -1,4 +1,4 @@
-![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/d02a2f1407d34b6781e71e8f4a73ba7f~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgc2Npc2FnYQ==:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiMTAyMTg4OTc3NDM2NTA4OCJ9&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1770286118&x-orig-sign=sHWLDbcuChqmUXM3Kbv4uQjMqFM%3D)
+# Ubuntu Server 24.04 新机必做：SSH + WireGuard 
 
 ## 1) 下载 Ubuntu Server 24.04 镜像（ISO）
 
